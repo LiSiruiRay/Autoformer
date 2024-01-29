@@ -1,5 +1,7 @@
 # Autoformer (NeurIPS 2021)
 
+#changed
+
 Autoformer: Decomposition Transformers with Auto-Correlation for Long-Term Series Forecasting
 
 Time series forecasting is a critical demand for real applications. Enlighted by the classic time series analysis and stochastic process theory, we propose the Autoformer as a general series forecasting model [[paper](https://arxiv.org/abs/2106.13008)]. **Autoformer goes beyond the Transformer family and achieves the series-wise connection for the first time.**
@@ -59,15 +61,19 @@ bash ./scripts/ILI_script/Autoformer.sh
 
 ### Reproduce with Docker
 
-To easily reproduce the results using Docker, conda and Make,  you can follow the next steps:
-1. Initialize the docker image using: `make init`. 
+To easily reproduce the results using Docker, conda and Make, you can follow the next steps:
+
+1. Initialize the docker image using: `make init`.
 2. Download the datasets using: `make get_dataset`.
 3. Run each script in `scripts/` using `make run_module module="bash scripts/ETT_script/Autoformer_ETTm1.sh"` for each script.
 4. Alternatively, run all the scripts at once:
+
 ```
 for file in `ls scripts`; do make run_module module="bash scripts/$script"; done
 ```
+
 ### A Simple Example
+
 See `predict.ipynb` for workflow (in Chinese).
 
 ## Main Results
@@ -91,7 +97,7 @@ We will keep adding series forecasting models to expand this repo:
 
 ## Citation
 
-If you find this repo useful, please cite our paper. 
+If you find this repo useful, please cite our paper.
 
 ```
 @inproceedings{wu2021autoformer,
@@ -115,4 +121,3 @@ https://github.com/zhouhaoyi/Informer2020
 https://github.com/zhouhaoyi/ETDataset
 
 https://github.com/laiguokun/multivariate-time-series-data
-
