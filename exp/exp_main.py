@@ -1,7 +1,8 @@
 import logging
+
 logging.basicConfig(format='%(asctime)s,%(msecs)03d %(levelname)-8s [%(filename)s:%(lineno)d] %(message)s',
-    datefmt='%Y-%m-%d:%H:%M:%S',
-    level=logging.INFO)
+                    datefmt='%Y-%m-%d:%H:%M:%S',
+                    level=logging.INFO)
 
 from data_provider.data_factory import data_provider
 from exp.exp_basic import Exp_Basic
@@ -56,6 +57,7 @@ class Exp_Main(Exp_Basic):
         # decoder input
         dec_inp = torch.zeros_like(batch_y[:, -self.args.pred_len:, :]).float()
         dec_inp = torch.cat([batch_y[:, :self.args.label_len, :], dec_inp], dim=1).float().to(self.device)
+
         # encoder - decoder
 
         def _run_model():
@@ -77,10 +79,14 @@ class Exp_Main(Exp_Basic):
         return outputs, batch_y
 
     def vali(self, vali_data, vali_loader, criterion):
+        print(f"started vali")
         total_loss = []
         self.model.eval()
         with torch.no_grad():
             for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(vali_loader):
+                print(f"in the for loop of vali: {i}")
+                if i == 1:
+                    break
                 batch_x = batch_x.float().to(self.device)
                 batch_y = batch_y.float()
 
@@ -110,7 +116,8 @@ class Exp_Main(Exp_Basic):
 
         time_now = time.time()
 
-        train_steps = len(train_loader)
+        # train_steps = len(train_loader)
+        train_steps = 10
         early_stopping = EarlyStopping(patience=self.args.patience, verbose=True)
 
         model_optim = self._select_optimizer()
@@ -119,13 +126,19 @@ class Exp_Main(Exp_Basic):
         if self.args.use_amp:
             scaler = torch.cuda.amp.GradScaler()
 
-        for epoch in range(self.args.train_epochs):
+        for epoch in range(1):
+            print(f"epoch time: {self.args.train_epochs}")
+
+            self.args.train_epochs = 1
+
             iter_count = 0
             train_loss = []
 
             self.model.train()
             epoch_time = time.time()
+            print(f"before for loop")
             for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(train_loader):
+                print(f"testing training, iter: {iter_count}")
                 iter_count += 1
                 model_optim.zero_grad()
                 batch_x = batch_x.float().to(self.device)
@@ -138,6 +151,9 @@ class Exp_Main(Exp_Basic):
 
                 loss = criterion(outputs, batch_y)
                 train_loss.append(loss.item())
+
+                if i == 0:
+                    break
 
                 if (i + 1) % 100 == 0:
                     print("\titers: {0}, epoch: {1} | loss: {2:.7f}".format(i + 1, epoch + 1, loss.item()))
@@ -157,8 +173,12 @@ class Exp_Main(Exp_Basic):
 
             print("Epoch: {} cost time: {}".format(epoch + 1, time.time() - epoch_time))
             train_loss = np.average(train_loss)
+            print(f"finished train_loss")
             vali_loss = self.vali(vali_data, vali_loader, criterion)
+            print(f"vali_loss")
             test_loss = self.vali(test_data, test_loader, criterion)
+
+            print(f"check datas: train_loss={train_loss}, val_loss={vali_loss}, test_loss={test_loss}")
 
             print("Epoch: {0}, Steps: {1} | Train Loss: {2:.7f} Vali Loss: {3:.7f} Test Loss: {4:.7f}".format(
                 epoch + 1, train_steps, train_loss, vali_loss, test_loss))
