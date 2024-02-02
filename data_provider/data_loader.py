@@ -97,11 +97,18 @@ class Dataset_ETT_hour(Dataset):
 
 
 class Dataset_ETT_minute(Dataset):
+    """
+    Approximate 2 years of data: from 2016-07-01 00:00:00 to 2018-06-26 19:45:00
+    69680 points.
+    Used 1 year data for training, 4 months for val, 4 months for testing
+    """
     def __init__(self, root_path, flag='train', size=None,
                  features='S', data_path='ETTm1.csv',
                  target='OT', scale=True, timeenc=0, freq='t'):
         # size [seq_len, label_len, pred_len]
         # info
+        print(f"called Dataset_ETT_minute init")
+        print(f"checking size: {size}")
         if size == None:
             self.seq_len = 24 * 4 * 4
             self.label_len = 24 * 4
@@ -113,6 +120,8 @@ class Dataset_ETT_minute(Dataset):
         # init
         assert flag in ['train', 'test', 'val']
         type_map = {'train': 0, 'val': 1, 'test': 2}
+
+        # for val, 1
         self.set_type = type_map[flag]
 
         self.features = features
@@ -130,13 +139,41 @@ class Dataset_ETT_minute(Dataset):
         df_raw = pd.read_csv(os.path.join(self.root_path,
                                           self.data_path))
 
-        border1s = [0, 12 * 30 * 24 * 4 - self.seq_len, 12 * 30 * 24 * 4 + 4 * 30 * 24 * 4 - self.seq_len]
-        border2s = [12 * 30 * 24 * 4, 12 * 30 * 24 * 4 + 4 * 30 * 24 * 4, 12 * 30 * 24 * 4 + 8 * 30 * 24 * 4]
+        # 24*4 is one day's data, 15min/per data,
+        # 12 is one year
+        border1s = [0,
+
+                    # (   34560  )
+                    # 1 year - self.seq_len
+                    12 * 30 * 24 * 4 - self.seq_len,
+
+                    # (             46080             )
+                    # 1 year + 4 month
+                    12 * 30 * 24 * 4 + 4 * 30 * 24 * 4 - self.seq_len]
+
+        #           (     34560    )
+        border2s = [12 * 30 * 24 * 4,
+
+                    # (             46080             )
+                    # 1 year + 4 month = 15 months
+                    12 * 30 * 24 * 4 + 4 * 30 * 24 * 4,
+
+                    # 1 year + 8 month = 20 months
+                    12 * 30 * 24 * 4 + 8 * 30 * 24 * 4]
+
+        # for non stationary training
+        border1s = [0, 700 - self.seq_len, 850 - self.seq_len]
+        border2s = [700, 850, 995]
+
+        # for val, 1
+        # 1 year - self.seq_len
         border1 = border1s[self.set_type]
+
+        # 1 year + 4 month = 15 months
         border2 = border2s[self.set_type]
 
         if self.features == 'M' or self.features == 'MS':
-            cols_data = df_raw.columns[1:]
+            cols_data = df_raw.columns[1:]  # no heading
             df_data = df_raw[cols_data]
         elif self.features == 'S':
             df_data = df_raw[[self.target]]
@@ -147,7 +184,8 @@ class Dataset_ETT_minute(Dataset):
             data = self.scaler.transform(df_data.values)
         else:
             data = df_data.values
-
+        # for train: 1 years data
+        # or val: 4 month after 1 year
         df_stamp = df_raw[['date']][border1:border2]
         df_stamp['date'] = pd.to_datetime(df_stamp.date)
         if self.timeenc == 0:
@@ -180,6 +218,10 @@ class Dataset_ETT_minute(Dataset):
         return seq_x, seq_y, seq_x_mark, seq_y_mark
 
     def __len__(self):
+        # print(f"len(self.data_x): {len(self.data_x)}")
+        # print(f"self.seq_len: {self.seq_len}")
+        # print(f"self.pred_len: {self.pred_len}")
+        # print(f"to return data: ={len(self.data_x) - self.seq_len - self.pred_len + 1}")
         return len(self.data_x) - self.seq_len - self.pred_len + 1
 
     def inverse_transform(self, data):
@@ -283,7 +325,7 @@ class Dataset_Custom(Dataset):
 
     def inverse_transform(self, data):
         return self.scaler.inverse_transform(data)
-    
+
 
 class Dataset_Pred(Dataset):
     def __init__(self, root_path, flag='pred', size=None,
