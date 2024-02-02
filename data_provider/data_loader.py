@@ -165,6 +165,10 @@ class Dataset_ETT_minute(Dataset):
         border1s = [0, 700 - self.seq_len, 850 - self.seq_len]
         border2s = [700, 850, 995]
 
+        #10 k non-stationary
+        border1s = [0, 9000 - self.seq_len, 9500 - self.seq_len]
+        border2s = [9000, 9500, 9990]
+
         # for val, 1
         # 1 year - self.seq_len
         border1 = border1s[self.set_type]
@@ -218,10 +222,10 @@ class Dataset_ETT_minute(Dataset):
         return seq_x, seq_y, seq_x_mark, seq_y_mark
 
     def __len__(self):
-        # print(f"len(self.data_x): {len(self.data_x)}")
-        # print(f"self.seq_len: {self.seq_len}")
-        # print(f"self.pred_len: {self.pred_len}")
-        # print(f"to return data: ={len(self.data_x) - self.seq_len - self.pred_len + 1}")
+        print(f"len(self.data_x): {len(self.data_x)}")
+        print(f"self.seq_len: {self.seq_len}")
+        print(f"self.pred_len: {self.pred_len}")
+        print(f"to return data: ={len(self.data_x) - self.seq_len - self.pred_len + 1}")
         return len(self.data_x) - self.seq_len - self.pred_len + 1
 
     def inverse_transform(self, data):
