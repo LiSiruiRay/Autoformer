@@ -180,6 +180,7 @@ class Dataset_ETT_minute(Dataset):
             cols_data = df_raw.columns[1:]  # no heading
             df_data = df_raw[cols_data]
         elif self.features == 'S':
+            # for univariate, this is "OT"
             df_data = df_raw[[self.target]]
 
         if self.scale:
@@ -222,10 +223,10 @@ class Dataset_ETT_minute(Dataset):
         return seq_x, seq_y, seq_x_mark, seq_y_mark
 
     def __len__(self):
-        print(f"len(self.data_x): {len(self.data_x)}")
-        print(f"self.seq_len: {self.seq_len}")
-        print(f"self.pred_len: {self.pred_len}")
-        print(f"to return data: ={len(self.data_x) - self.seq_len - self.pred_len + 1}")
+        # print(f"len(self.data_x): {len(self.data_x)}")
+        # print(f"self.seq_len: {self.seq_len}")
+        # print(f"self.pred_len: {self.pred_len}")
+        # print(f"to return data: ={len(self.data_x) - self.seq_len - self.pred_len + 1}")
         return len(self.data_x) - self.seq_len - self.pred_len + 1
 
     def inverse_transform(self, data):
