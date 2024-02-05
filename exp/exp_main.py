@@ -178,7 +178,11 @@ class Exp_Main(Exp_Basic):
         test_data, test_loader = self._get_data(flag='test')
         if test:
             print('loading model')
-            self.model.load_state_dict(torch.load(os.path.join('./checkpoints/' + setting, 'checkpoint.pth')))
+            if not self.args.use_gpu:
+                self.model.load_state_dict(torch.load(os.path.join('./checkpoints/' + setting, 'checkpoint.pth'),
+                                                      map_location=torch.device('cpu')))
+            else:
+                self.model.load_state_dict(torch.load(os.path.join('./checkpoints/' + setting, 'checkpoint.pth')))
 
         preds = []
         trues = []
@@ -245,7 +249,10 @@ class Exp_Main(Exp_Basic):
             path = os.path.join(self.args.checkpoints, setting)
             best_model_path = path + '/' + 'checkpoint.pth'
             logging.info(best_model_path)
-            self.model.load_state_dict(torch.load(best_model_path))
+            if not self.args.use_gpu:
+                self.model.load_state_dict(torch.load(best_model_path, map_location=torch.device('cpu')))
+            else:
+                self.model.load_state_dict(torch.load(best_model_path))
 
         preds = []
 
