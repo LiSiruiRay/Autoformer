@@ -54,7 +54,7 @@ class Exp_Main(Exp_Basic):
 
     def _predict(self, batch_x, batch_y, batch_x_mark, batch_y_mark):
         # decoder input
-        dec_inp = torch.zeros_like(batch_y[:, -self.args.pred_len:, :]).float()
+        dec_inp = torch.zeros_like(batch_y[:, -self.args.pred_len:, :]).float() # mask
         dec_inp = torch.cat([batch_y[:, :self.args.label_len, :], dec_inp], dim=1).float().to(self.device)
         # encoder - decoder
 

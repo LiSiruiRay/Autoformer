@@ -4,7 +4,7 @@ python -u run.py \
   --use_gpu 0 \
   --root_path ./dataset/ETT-small/ \
   --data_path ETTm2.csv \
-  --model_id ETTm2_96_96 \
+  --model_id ETTm2_96_720 \
   --model Autoformer \
   --data ETTm2 \
   --features S \

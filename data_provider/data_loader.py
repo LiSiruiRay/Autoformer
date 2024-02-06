@@ -162,12 +162,12 @@ class Dataset_ETT_minute(Dataset):
                     12 * 30 * 24 * 4 + 8 * 30 * 24 * 4]
 
         # for non stationary training
-        border1s = [0, 700 - self.seq_len, 850 - self.seq_len]
-        border2s = [700, 850, 995]
-
-        #10 k non-stationary
-        border1s = [0, 9000 - self.seq_len, 9500 - self.seq_len]
-        border2s = [9000, 9500, 9990]
+        # border1s = [0, 700 - self.seq_len, 850 - self.seq_len]
+        # border2s = [700, 850, 995]
+        #
+        # #10 k non-stationary
+        # border1s = [0, 9000 - self.seq_len, 9500 - self.seq_len]
+        # border2s = [9000, 9500, 9990]
 
         # for val, 1
         # 1 year - self.seq_len
@@ -215,8 +215,8 @@ class Dataset_ETT_minute(Dataset):
         r_begin = s_end - self.label_len
         r_end = r_begin + self.label_len + self.pred_len
 
-        seq_x = self.data_x[s_begin:s_end]
-        seq_y = self.data_y[r_begin:r_end]
+        seq_x = self.data_x[s_begin:s_end] # length is self.seq_len
+        seq_y = self.data_y[r_begin:r_end] # length = self.label_len + self.pred_len
         seq_x_mark = self.data_stamp[s_begin:s_end]
         seq_y_mark = self.data_stamp[r_begin:r_end]
 

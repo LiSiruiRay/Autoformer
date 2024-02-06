@@ -1,3 +1,6 @@
 ETTm2_96_96_Autoformer_ETTm2_ftS_sl96_ll96_pl96_dm512_nh8_el2_dl1_df2048_fc3_ebtimeF_dtTrue_Exp_0  
 mse:0.16243934631347656, mae:0.3117655813694
 
+ETTm2_96_96_Autoformer_ETTm2_ftS_sl96_ll96_pl96_dm512_nh8_el2_dl1_df2048_fc3_ebtimeF_dtTrue_Exp_0  
+mse:0.16243934631347656, mae:0.3117655813694
+
