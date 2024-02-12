@@ -23,7 +23,7 @@ run_module: .require-module
 		${IMAGE} ${module}
 
 bash_docker:
-	docker run -it --rm ${DOCKER_PARAMETERS} ${IMAGE}
+	docker run -it --ram ${DOCKER_PARAMETERS} ${IMAGE}
 
 .require-module:
 ifndef module
