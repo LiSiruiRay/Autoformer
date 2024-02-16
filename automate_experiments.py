@@ -31,25 +31,7 @@ with open(args.config, 'r') as file:
 #     command_str = ' '.join(command) + f" > {output_file}"
 #
 #     subprocess.run(command_str, shell=True)
-counter = 0
 for exp in experiments:
-    job_name = f"autoformer_{exp['model_id']}"
-    python_output_file = f"python_output_{exp['model_id']}.txt"
-
-    # Read the content of the shell script
-    with open('test.sh', 'r') as file:
-        script_content = file.read()
-
-    # Replace placeholders with actual values
-    script_content = (script_content.replace('%%GPUS%%', str(exp['gpus']) if "gpus" in exp else '3')
-                      .replace('%%TIME%%', exp['time'] if "time" in exp else "4:00:00"))
-
-    # Write the modified script to a temporary file
-    temp_script_name = f'temp_test_{counter}.sh'
-    counter += 1
-    with open(temp_script_name, 'w') as file:
-        file.write(script_content)
-
     seq_len = exp['seq_len'] if 'seq_len' in exp else 96
     label_len = exp['label_len'] if 'label_len' in exp else 96
     pred_len = exp['pred_len'] if 'pred_len' in exp else 96
@@ -76,6 +58,22 @@ for exp in experiments:
 
     model_id = f"s{seq_len}_l{label_len}_p{pred_len}_pa{patience}_tp{train_epochs}_des-{description}"
 
+    job_name = f"autoformer_{model_id}"
+    python_output_file = f"python_output_{model_id}.txt"
+
+    # Read the content of the shell script
+    with open('experiment.sh', 'r') as file:
+        script_content = file.read()
+
+    # Replace placeholders with actual values
+    script_content = (script_content.replace('%%GPUS%%', str(exp['gpus']) if "gpus" in exp else '3')
+                      .replace('%%TIME%%', exp['time'] if "time" in exp else "4:00:00"))
+
+    # Write the modified script to a temporary file
+    temp_script_name = f'temp.sh'
+    with open(temp_script_name, 'w') as file:
+        file.write(script_content)
+
     command = [
         'sbatch', temp_script_name, python_output_file,
         '--model_id', model_id,
@@ -86,12 +84,26 @@ for exp in experiments:
         '--train_epochs', train_epochs,
         '--root_path', root_path,
         '--data_path', data_path,
+        '--is_training', is_training,
+        '--model', model,
+        '--data', data,
+        '--features', features,
+        '--e_layers', e_layers,
+        '--d_layers', d_layers,
+        '--factor', factor,
+        '--enc_in', enc_in,
+        '--dec_in', dec_in,
+        '--c_out', c_out,
+        '--des', des,
+        '--freq', freq,
+        '--itr', itr
         # Add other parameters
     ]
 
+    command = [str(i) for i in command]
+
     # Execute the command
-    command_str = ' '.join(command) + f" > sbatch_output_{exp['model_id']}.txt"
-    #
+    command_str = ' '.join(command) + f" > sbatch_output_{model_id}.txt"
     print(command_str)
     subprocess.run(command_str, shell=True)
 
