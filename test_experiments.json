@@ -1,0 +1,18 @@
+[
+  {
+    "gpus": 3,
+    "time": "4:00:00",
+    "model_id": "differ_label_input_1440_l720_96",
+    "seq_len": "1440",
+    "label_len": "720",
+    "pred_len": "96"
+  },
+  {
+    "gpus": 3,
+    "time": "4:00:00",
+    "model_id": "differ_label_input_1440_l768_96",
+    "seq_len": "1440",
+    "label_len": "768",
+    "pred_len": "96"
+  }
+]
