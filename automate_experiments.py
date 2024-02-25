@@ -3,6 +3,7 @@
 # Description:
 
 import json
+import os
 import subprocess
 import argparse
 
@@ -15,22 +16,6 @@ args = parser.parse_args()
 with open(args.config, 'r') as file:
     experiments = json.load(file)
 
-# Loop over the experiments and run each one
-# for exp in experiments:
-#     job_name = f"autoformer_{exp['model_id']}"
-#     output_file = f"output_{exp['model_id']}.txt"
-#
-#     command = [
-#         'sbatch', 'run_experiment.sh', job_name,
-#         '--model_id', exp['model_id'],
-#         '--seq_len', exp['seq_len'],
-#         '--label_len', exp['label_len'],
-#         '--pred_len', exp['pred_len'],
-#         # Add other parameters here
-#     ]
-#     command_str = ' '.join(command) + f" > {output_file}"
-#
-#     subprocess.run(command_str, shell=True)
 for exp in experiments:
     seq_len = exp['seq_len'] if 'seq_len' in exp else 96
     label_len = exp['label_len'] if 'label_len' in exp else 96
@@ -54,12 +39,14 @@ for exp in experiments:
     freq = exp['freq'] if 'freq' in exp else 't'
     itr = exp['itr'] if 'itr' in exp else 1
 
+    work_output_folder = exp['work_output_folder'] if 'work_output_folder' in exp else "work_output_folder"
+
     description = exp['description'] if 'description' in exp else ''
 
-    model_id = f"s{seq_len}_l{label_len}_p{pred_len}_pa{patience}_tp{train_epochs}_des-{description}"
+    model_id = f"seq{seq_len}_label{label_len}_p{pred_len}_pati{patience}_epoch{train_epochs}_des-{description}"
 
     job_name = f"autoformer_{model_id}"
-    python_output_file = f"python_output_{model_id}.txt"
+    python_output_file = f"{work_output_folder}/python_output_{model_id}.txt"
 
     # Read the content of the shell script
     with open('experiment.sh', 'r') as file:
@@ -103,8 +90,13 @@ for exp in experiments:
     command = [str(i) for i in command]
 
     # Execute the command
-    command_str = ' '.join(command) + f" > sbatch_output_{model_id}.txt"
+    command_str = ' '.join(command) + f" > {work_output_folder}/sbatch_output_{model_id}.txt"
     print(command_str)
+    if not os.path.exists(work_output_folder):
+        os.makedirs(work_output_folder)
+        print(f"Folder '{work_output_folder}' created.")
+    else:
+        print(f"Folder '{work_output_folder}' already exists.")
     subprocess.run(command_str, shell=True)
 
     # Optionally, delete the temporary script if you don't need it anymore
