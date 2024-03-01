@@ -38,6 +38,8 @@ for exp in experiments:
     des = exp['des'] if 'des' in exp else 'Exp'
     freq = exp['freq'] if 'freq' in exp else 't'
     itr = exp['itr'] if 'itr' in exp else 1
+    task_id = exp['task_id'] if 'task_id' in exp else "default_task"
+    d_model = exp['d_model'] if 'd_model' in exp else 512
 
     work_output_folder = exp['work_output_folder'] if 'work_output_folder' in exp else "work_output_folder"
 
@@ -66,7 +68,7 @@ for exp in experiments:
 
     command = [
         'sbatch', temp_script_name, python_output_file,
-        '--model_id', model_id,
+        # '--model_id', model_id,
         '--seq_len', seq_len,
         '--label_len', label_len,
         '--pred_len', pred_len,
@@ -86,7 +88,8 @@ for exp in experiments:
         '--c_out', c_out,
         '--des', des,
         '--freq', freq,
-        '--itr', itr
+        '--itr', itr,
+        '--task_id', task_id,
         # Add other parameters
     ]
 

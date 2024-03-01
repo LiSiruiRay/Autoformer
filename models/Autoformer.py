@@ -3,7 +3,7 @@ import torch.nn as nn
 from layers.Embed import DataEmbedding_wo_pos
 from layers.AutoCorrelation import AutoCorrelation, AutoCorrelationLayer
 from layers.Autoformer_EncDec import Encoder, Decoder, EncoderLayer, DecoderLayer, my_Layernorm, series_decomp
-
+from layers.SelfAttention_Family import FullAttention, AttentionLayer
 
 class Model(nn.Module):
     """
@@ -30,46 +30,79 @@ class Model(nn.Module):
                                                   configs.dropout)
 
         # Encoder
+        # self.encoder = Encoder(
+        #     [
+        #         EncoderLayer(
+        #             AutoCorrelationLayer(
+        #                 AutoCorrelation(False, configs.factor, attention_dropout=configs.dropout,
+        #                                 output_attention=configs.output_attention),
+        #                 configs.d_model, configs.n_heads),
+        #             configs.d_model,
+        #             configs.d_ff,
+        #             moving_avg=configs.moving_avg,
+        #             dropout=configs.dropout,
+        #             activation=configs.activation
+        #         ) for l in range(configs.e_layers)
+        #     ],
+        #     norm_layer=my_Layernorm(configs.d_model)
+        # )
         self.encoder = Encoder(
             [
                 EncoderLayer(
-                    AutoCorrelationLayer(
-                        AutoCorrelation(False, configs.factor, attention_dropout=configs.dropout,
-                                        output_attention=configs.output_attention),
-                        configs.d_model, configs.n_heads),
+                    AttentionLayer(
+                        FullAttention(False, configs.factor, attention_dropout=configs.dropout,
+                                      output_attention=configs.output_attention), configs.d_model, configs.n_heads),
                     configs.d_model,
                     configs.d_ff,
-                    moving_avg=configs.moving_avg,
                     dropout=configs.dropout,
                     activation=configs.activation
                 ) for l in range(configs.e_layers)
             ],
-            norm_layer=my_Layernorm(configs.d_model)
+            norm_layer=torch.nn.LayerNorm(configs.d_model)
         )
         # Decoder
         self.decoder = Decoder(
             [
                 DecoderLayer(
-                    AutoCorrelationLayer(
-                        AutoCorrelation(True, configs.factor, attention_dropout=configs.dropout,
-                                        output_attention=False),
+                    AttentionLayer(
+                        FullAttention(True, configs.factor, attention_dropout=configs.dropout, output_attention=False),
                         configs.d_model, configs.n_heads),
-                    AutoCorrelationLayer(
-                        AutoCorrelation(False, configs.factor, attention_dropout=configs.dropout,
-                                        output_attention=False),
+                    AttentionLayer(
+                        FullAttention(False, configs.factor, attention_dropout=configs.dropout, output_attention=False),
                         configs.d_model, configs.n_heads),
                     configs.d_model,
-                    configs.c_out,
                     configs.d_ff,
-                    moving_avg=configs.moving_avg,
                     dropout=configs.dropout,
                     activation=configs.activation,
                 )
                 for l in range(configs.d_layers)
             ],
-            norm_layer=my_Layernorm(configs.d_model),
+            norm_layer=torch.nn.LayerNorm(configs.d_model),
             projection=nn.Linear(configs.d_model, configs.c_out, bias=True)
         )
+        # self.decoder = Decoder(
+        #     [
+        #         DecoderLayer(
+        #             AutoCorrelationLayer(
+        #                 AutoCorrelation(True, configs.factor, attention_dropout=configs.dropout,
+        #                                 output_attention=False),
+        #                 configs.d_model, configs.n_heads),
+        #             AutoCorrelationLayer(
+        #                 AutoCorrelation(False, configs.factor, attention_dropout=configs.dropout,
+        #                                 output_attention=False),
+        #                 configs.d_model, configs.n_heads),
+        #             configs.d_model,
+        #             configs.c_out,
+        #             configs.d_ff,
+        #             moving_avg=configs.moving_avg,
+        #             dropout=configs.dropout,
+        #             activation=configs.activation,
+        #         )
+        #         for l in range(configs.d_layers)
+        #     ],
+        #     norm_layer=my_Layernorm(configs.d_model),
+        #     projection=nn.Linear(configs.d_model, configs.c_out, bias=True)
+        # )
 
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec,
                 enc_self_mask=None, dec_self_mask=None, dec_enc_mask=None):

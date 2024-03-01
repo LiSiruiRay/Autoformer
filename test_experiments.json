@@ -1,18 +1,13 @@
 [
   {
-    "gpus": 3,
-    "time": "4:00:00",
-    "model_id": "differ_label_input_1440_l720_96",
-    "seq_len": "1440",
-    "label_len": "720",
-    "pred_len": "96"
-  },
-  {
-    "gpus": 3,
-    "time": "4:00:00",
-    "model_id": "differ_label_input_1440_l768_96",
-    "seq_len": "1440",
-    "label_len": "768",
-    "pred_len": "96"
+    "gpus": 1,
+    "time": "3:00:00",
+    "description": "first_test_after_change_en_de_to_trans",
+    "root_path": "./dataset/self_made/",
+    "data_path": "non_stat_data_sin_x_sq_en7_p96_amp5.csv",
+    "seq_len": 96,
+    "label_len": 48,
+    "pred_len": 96,
+    "train_epochs": 1
   }
 ]

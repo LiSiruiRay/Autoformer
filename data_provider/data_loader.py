@@ -141,25 +141,25 @@ class Dataset_ETT_minute(Dataset):
 
         # 24*4 is one day's data, 15min/per data,
         # 12 is one year
-        border1s = [0,
-
-                    # (   34560  )
-                    # 1 year - self.seq_len
-                    12 * 30 * 24 * 4 - self.seq_len,
-
-                    # (             46080             )
-                    # 1 year + 4 month
-                    12 * 30 * 24 * 4 + 4 * 30 * 24 * 4 - self.seq_len]
-
-        #           (     34560    )
-        border2s = [12 * 30 * 24 * 4,
-
-                    # (             46080             )
-                    # 1 year + 4 month = 15 months
-                    12 * 30 * 24 * 4 + 4 * 30 * 24 * 4,
-
-                    # 1 year + 8 month = 20 months
-                    12 * 30 * 24 * 4 + 8 * 30 * 24 * 4]
+        # border1s = [0,
+        #
+        #             # (   34560  )
+        #             # 1 year - self.seq_len
+        #             12 * 30 * 24 * 4 - self.seq_len,
+        #
+        #             # (             46080             )
+        #             # 1 year + 4 month
+        #             12 * 30 * 24 * 4 + 4 * 30 * 24 * 4 - self.seq_len]
+        #
+        # #           (     34560    )
+        # border2s = [12 * 30 * 24 * 4,
+        #
+        #             # (             46080             )
+        #             # 1 year + 4 month = 15 months
+        #             12 * 30 * 24 * 4 + 4 * 30 * 24 * 4,
+        #
+        #             # 1 year + 8 month = 20 months
+        #             12 * 30 * 24 * 4 + 8 * 30 * 24 * 4]
 
         # for non stationary training
         # border1s = [0, 700 - self.seq_len, 850 - self.seq_len]
@@ -168,6 +168,10 @@ class Dataset_ETT_minute(Dataset):
         # #10 k non-stationary
         # border1s = [0, 9000 - self.seq_len, 9500 - self.seq_len]
         # border2s = [9000, 9500, 9990]
+
+        # test
+        border1s = [0, 200 - self.seq_len, 300 - self.seq_len]
+        border2s = [200, 300, 500]
 
         # for val, 1
         # 1 year - self.seq_len
