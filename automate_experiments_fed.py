@@ -116,6 +116,7 @@ for exp in experiments:
         '--itr', itr,
         '--task_id', task_id,
 
+
         # added
         '--version', version,
         '--mode_select', mode_select,
@@ -124,6 +125,7 @@ for exp in experiments:
         '--base', base,
         '--cross_activation', cross_activation,
         '--target', target,
+        '--d_model', d_model,
 
 
         # Actions
