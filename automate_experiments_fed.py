@@ -29,15 +29,16 @@ for exp in experiments:
     features = exp['features'] if 'features' in exp else 'S'
     model = exp['model'] if 'model' in exp else "Autoformer"
     data = exp['data'] if 'data' in exp else "ETTm2"
+
     e_layers = exp['e_layers'] if 'e_layers' in exp else 2
     d_layers = exp['d_layers'] if 'd_layers' in exp else 1
     factor = exp['factor'] if 'factor' in exp else 1
-    enc_in = exp['enc_in'] if 'enc_in' in exp else 1
-    dec_in = exp['dec_in'] if 'dec_in' in exp else 1
-    c_out = exp['c_out'] if 'c_out' in exp else 1
-    des = exp['des'] if 'des' in exp else 'Exp'
+    enc_in = exp['enc_in'] if 'enc_in' in exp else 7
+    dec_in = exp['dec_in'] if 'dec_in' in exp else 7
+    c_out = exp['c_out'] if 'c_out' in exp else 7
+    des = exp['des'] if 'des' in exp else 'test'
     freq = exp['freq'] if 'freq' in exp else 'h'
-    itr = exp['itr'] if 'itr' in exp else 1
+    itr = exp['itr'] if 'itr' in exp else 3
     task_id = exp['task_id'] if 'task_id' in exp else "default_task"
     d_model = exp['d_model'] if 'd_model' in exp else 512
     version = exp['version'] if 'version' in exp else 'Fourier'
@@ -53,13 +54,16 @@ for exp in experiments:
     n_heads = exp['n_heads'] if 'n_heads' in exp else 8
     d_ff = exp['d_ff'] if 'd_ff' in exp else 2048
     moving_avg = exp['moving_avg'] if 'moving_avg' in exp else [24]
-    distil = exp['distil'] if 'distil' in exp else 'store_false'
     dropout = exp['dropout'] if 'dropout' in exp else 0.05
     embed = exp['embed'] if 'embed' in exp else 'timeF'
     activation = exp['activation'] if 'activation' in exp else 'gelu'
-    output_attention = exp['output_attention'] if 'output_attention' in exp else 'store_true'
 
-
+    # action
+    output_attention = exp['output_attention'] if 'output_attention' in exp else False
+    distil = exp['distil'] if 'distil' in exp else True
+    do_predict = exp['do_predict'] if 'do_predict' in exp else False
+    use_amp = exp['use_amp'] if 'use_amp' in exp else False
+    use_multi_gpu = exp['use_multi_gpu'] if 'use_multi_gpu' in exp else False
 
     work_output_folder = exp['work_output_folder'] if 'work_output_folder' in exp else "work_output_folder"
 
@@ -111,6 +115,11 @@ for exp in experiments:
         '--itr', itr,
         '--task_id', task_id,
         # Add other parameters
+        *(['--output_attention'] if output_attention else []),
+        *(['--distil'] if distil else []),
+        *(['--do_predict'] if do_predict else []),
+        *(['--use_amp'] if use_amp else []),
+        *(['--use_multi_gpu'] if use_multi_gpu else []),
     ]
 
     command = [str(i) for i in command]
