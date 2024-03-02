@@ -100,6 +100,7 @@ for exp in experiments:
         '--train_epochs', train_epochs,
         '--root_path', root_path,
         '--data_path', data_path,
+
         '--is_training', is_training,
         '--model', model,
         '--data', data,
@@ -114,7 +115,18 @@ for exp in experiments:
         '--freq', freq,
         '--itr', itr,
         '--task_id', task_id,
-        # Add other parameters
+
+        # added
+        '--version', version,
+        '--mode_select', mode_select,
+        '--modes', modes,
+        '--L', L,
+        '--base', base,
+        '--cross_activation', cross_activation,
+        '--target', target,
+
+
+        # Actions
         *(['--output_attention'] if output_attention else []),
         *(['--distil'] if distil else []),
         *(['--do_predict'] if do_predict else []),
