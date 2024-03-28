@@ -1,13 +1,40 @@
 # Author: ray
 # Date: 2/16/24
 # Description:
-
+import csv
 import json
 import os
 import subprocess
 import argparse
 from datetime import datetime
 import pytz
+
+import hashlib
+import shutil
+
+
+def generate_id_from_csv(file_path):
+    # Initialize an empty string to store the CSV content
+    content = ""
+
+    # Open the CSV file and read its content
+    with open(file_path, mode='r', encoding='utf-8') as csv_file:
+        csv_reader = csv.reader(csv_file)
+        for row in csv_reader:
+            # Convert the row to a string and append it to the content
+            content += ','.join(row) + '\n'
+
+    # Convert the content to bytes
+    content_bytes = content.encode('utf-8')
+
+    # Create a SHA-256 hash object
+    hash_object = hashlib.sha256(content_bytes)
+
+    # Generate the hash
+    hex_dig = hash_object.hexdigest()
+
+    return hex_dig
+
 
 def get_time_string():
     # Define the timezone for Abu Dhabi
@@ -21,10 +48,27 @@ def get_time_string():
 
     return time_string_id
 
-def store_dataset_info(root_path: str, data_path: str):
+
+def store_dataset_info(root_path: str, data_path: str, dataset_id: str, meta_info_folder="meta_info"):
+    meta_info_dataset_path = os.path.join(meta_info_folder, "datasets_info")
+    if not os.path.exists(meta_info_dataset_path):
+        os.makedirs(meta_info_dataset_path)
+        print(f"Folder '{meta_info_dataset_path}' created.")
+    else:
+        print(f"Folder '{meta_info_dataset_path}' already exists.")
+
+    destination_path = os.path.join(meta_info_dataset_path, f"{dataset_id}.csv")
+
+    if os.path.exists(destination_path):
+        return
+
+    source_path = os.path.join(root_path, data_path)
+    shutil.copy(source_path, destination_path)
+
+
+def store_model_meta_info():
     pass
 
-def store_model_meta_info()
 
 def store_meta_info(meta_info: dict):
     meta_info_folder = "meta_info"
@@ -36,7 +80,13 @@ def store_meta_info(meta_info: dict):
 
     root_path = meta_info["root_path"]
     data_path = meta_info["data_path"]
-    store_dataset_info(root_path=root_path, data_path=data_path)
+
+    dataset_path = os.path.join(root_path, data_path)
+    dataset_id = generate_id_from_csv(dataset_path)
+    meta_info["dataset_id"] = dataset_id
+
+    store_dataset_info(root_path=root_path, data_path=data_path, dataset_id=dataset_id)
+
     pass
 
 
@@ -105,10 +155,10 @@ def main():
         description = exp['description'] if 'description' in exp else ''
 
         # model_id = f"seq{seq_len}_label{label_len}_p{pred_len}_pati{patience}_epoch{train_epochs}"
-        model_id = get_time_string()
+        task_id = f"{task_id}_{get_time_string()}"
 
         # job_name = f"autoformer_{model_id}"
-        python_output_file = f"{work_output_folder}/python_output_{model_id}.txt"
+        python_output_file = f"{work_output_folder}/python_output_{task_id}.txt"
 
         model_name = '{}_{}_{}_modes{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_fc{}_eb{}_dt{}_{}_{}'.format(
             task_id,
@@ -138,7 +188,7 @@ def main():
         # Replace placeholders with actual values
         script_content = (script_content.replace('%%GPUS%%', str(exp['gpus']) if "gpus" in exp else '3')
                           .replace('%%TIME%%', exp['time'] if "time" in exp else "4:00:00")
-                          .replace('%%JOBNAME%%', model_id)
+                          .replace('%%JOBNAME%%', task_id)
                           .replace('%%OUTPUT%%', f"{work_output_folder}/job_output_%j.txt")
                           .replace('%%ERROR%%', f"{work_output_folder}/job_error_%j.txt"))
 
@@ -238,12 +288,11 @@ def main():
             "use_multi_gpu": use_multi_gpu,
             "work_output_folder": work_output_folder,
             "description": description,
-            "model_id": model_id,
+            # "model_id": model_id,
             "python_output_file": python_output_file,
             "script_content": script_content,
             "command": command
         }
-
 
         if not os.path.exists(work_output_folder):
             os.makedirs(work_output_folder)
