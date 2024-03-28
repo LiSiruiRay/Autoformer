@@ -305,6 +305,7 @@ def main():
             "script_content": script_content,
             "command": command
         }
+        store_meta_info(model_meta_info)
 
         if not os.path.exists(work_output_folder):
             os.makedirs(work_output_folder)
