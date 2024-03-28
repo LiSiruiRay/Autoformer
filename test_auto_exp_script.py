@@ -13,7 +13,9 @@ class MyTestCase(unittest.TestCase):
 
         model_meta_info = {
             "root_path": root_path,
-            "data_path": data_path, }
+            "data_path": data_path,
+            "task_id": "testing_meta_script",
+        }
         store_meta_info(model_meta_info)
 
 

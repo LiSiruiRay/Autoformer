@@ -60,14 +60,27 @@ def store_dataset_info(root_path: str, data_path: str, dataset_id: str, meta_inf
     destination_path = os.path.join(meta_info_dataset_path, f"{dataset_id}.csv")
 
     if os.path.exists(destination_path):
+        print(f"dataset existed")
         return
 
     source_path = os.path.join(root_path, data_path)
     shutil.copy(source_path, destination_path)
 
 
-def store_model_meta_info():
-    pass
+def store_model_meta_info(meta_info: dict, meta_info_folder="meta_info"):
+    meta_info_generated_ts = get_time_string()
+    task_id = meta_info["task_id"]
+    meta_data_file_folder_path = os.path.join(meta_info_folder, "model_meta_info")
+
+    if not os.path.exists(meta_data_file_folder_path):
+        os.makedirs(meta_data_file_folder_path)
+        print(f"Folder '{meta_data_file_folder_path}' created.")
+    else:
+        print(f"Folder '{meta_data_file_folder_path}' already exists.")
+
+    meta_data_file_path = os.path.join(meta_data_file_folder_path, f"{task_id}_{meta_info_generated_ts}.json")
+    with open(meta_data_file_path, "w") as f:
+        json.dump(meta_info, f, indent=4)
 
 
 def store_meta_info(meta_info: dict):
@@ -86,8 +99,7 @@ def store_meta_info(meta_info: dict):
     meta_info["dataset_id"] = dataset_id
 
     store_dataset_info(root_path=root_path, data_path=data_path, dataset_id=dataset_id)
-
-    pass
+    store_model_meta_info(meta_info=meta_info)
 
 
 def main():
