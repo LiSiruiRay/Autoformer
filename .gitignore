@@ -1,5 +1,6 @@
 # result of model test
 results/
+meta_info/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
