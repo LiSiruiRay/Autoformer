@@ -157,7 +157,7 @@ def main():
 
         # action
         output_attention = exp['output_attention'] if 'output_attention' in exp else False
-        distil = exp['distil'] if 'distil' in exp else True
+        distil = exp['distil'] if 'distil' in exp else False
         do_predict = exp['do_predict'] if 'do_predict' in exp else False
         use_amp = exp['use_amp'] if 'use_amp' in exp else False
         use_multi_gpu = exp['use_multi_gpu'] if 'use_multi_gpu' in exp else False
@@ -313,7 +313,7 @@ def main():
         else:
             print(f"Folder '{work_output_folder}' already exists.")
         # Execute the command
-        command_str = ' '.join(command) + f" > {work_output_folder}/sbatch_output_{model_id}.txt"
+        command_str = ' '.join(command) + f" > {work_output_folder}/sbatch_output_{task_id}.txt"
         print(command_str)
 
         subprocess.run(command_str, shell=True)
