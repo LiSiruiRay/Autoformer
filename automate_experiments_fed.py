@@ -247,7 +247,7 @@ def main():
 
             # Actions
             *(['--output_attention'] if output_attention else []),
-            *(['--distil'] if distil else []),
+            *(['--distil'] if not distil else []),
             *(['--do_predict'] if do_predict else []),
             *(['--use_amp'] if use_amp else []),
             *(['--use_multi_gpu'] if use_multi_gpu else []),
